@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.local
+screenshots/
+screenshots2/
+screenshot.mjs
+screenshot2.mjs
+debug.mjs
