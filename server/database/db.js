@@ -1,7 +1,9 @@
 const { Database } = require('node-sqlite3-wasm');
 const path = require('path');
 
-const db = new Database(path.join(__dirname, 'fitness.db'));
+// node-sqlite3-wasm requires forward-slash paths (WASM limitation on Windows)
+const dbPath = path.join(__dirname, 'fitness.db').replace(/\\/g, '/');
+const db = new Database(dbPath);
 
 db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
