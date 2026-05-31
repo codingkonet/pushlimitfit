@@ -11,3 +11,5 @@ screenshot.mjs
 screenshot2.mjs
 debug.mjs
 diagform.mjs
+verify.mjs
+*.log
