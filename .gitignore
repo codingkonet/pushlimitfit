@@ -3,6 +3,8 @@ dist/
 *.db
 *.db-shm
 *.db-wal
+*.db.lock/
+*.db.lock
 .env
 .env.local
 screenshots/
@@ -11,5 +13,6 @@ screenshot.mjs
 screenshot2.mjs
 debug.mjs
 diagform.mjs
+diagreg.mjs
 verify.mjs
 *.log

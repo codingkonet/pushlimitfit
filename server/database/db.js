@@ -1,11 +1,13 @@
 const { Database } = require('node-sqlite3-wasm');
 const path = require('path');
 
-// node-sqlite3-wasm requires forward-slash paths (WASM limitation on Windows)
-const dbPath = path.join(__dirname, 'fitness.db').replace(/\\/g, '/');
+// On Vercel, only /tmp is writable. Locally use the database directory.
+// node-sqlite3-wasm also requires forward-slash paths on Windows.
+const dbPath = process.env.VERCEL
+  ? '/tmp/fitness.db'
+  : path.join(__dirname, 'fitness.db').replace(/\\/g, '/');
 const db = new Database(dbPath);
 
-db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
 
 db.exec(`
