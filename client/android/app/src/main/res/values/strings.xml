@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PushLIMITfit</string>
+    <string name="title_activity_main">PushLIMITfit</string>
+    <string name="package_name">com.pushlimitfit.app</string>
+    <string name="custom_url_scheme">com.pushlimitfit.app</string>
+</resources>
