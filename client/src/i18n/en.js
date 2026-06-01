@@ -178,7 +178,8 @@ const en = {
   // Landing
   landingHero: 'Push Your LIMIT.\nBuild Your Future.',
   landingSubtitle: 'Track workouts, calculate calories, follow expert plans — all in one powerful platform.',
-  startFree: 'Start Free',
+  startFree: 'Get Started',
+  openApp: 'Open App',
   featuresTitle: 'Everything you need to transform',
   howItWorksTitle: 'Get started in 3 simple steps',
   step1Title: 'Create your account',

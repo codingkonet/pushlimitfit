@@ -1,4 +1,3 @@
-// Common foods database (per 100g)
 const foods = [
   { id: 1, name: 'Chicken Breast (cooked)', calories: 165, protein: 31, carbs: 0, fat: 3.6, category: 'Protein' },
   { id: 2, name: 'Salmon (cooked)', calories: 208, protein: 20, carbs: 0, fat: 13, category: 'Protein' },
@@ -35,11 +34,11 @@ const foods = [
   { id: 33, name: 'Tofu (firm)', calories: 76, protein: 8, carbs: 2, fat: 4.8, category: 'Plant Protein' },
   { id: 34, name: 'Edamame', calories: 121, protein: 11, carbs: 9, fat: 5, category: 'Plant Protein' },
   { id: 35, name: 'Tempeh', calories: 193, protein: 19, carbs: 9, fat: 11, category: 'Plant Protein' },
-  { id: 36, name: 'Corn (cooked)', calories: 96, protein: 3.4, carbs: 21, fat: 1.5, category: 'Vegetables' },
-  { id: 37, name: 'Carrot (raw)', calories: 41, protein: 0.9, carbs: 10, fat: 0.2, category: 'Vegetables' },
-  { id: 38, name: 'Bell Pepper (red)', calories: 31, protein: 1, carbs: 7, fat: 0.3, category: 'Vegetables' },
-  { id: 39, name: 'Strawberries', calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3, category: 'Fruits' },
-  { id: 40, name: 'Whole Milk Yogurt', calories: 61, protein: 3.5, carbs: 4.7, fat: 3.3, category: 'Dairy' }
+  { id: 36, name: 'Carrot (raw)', calories: 41, protein: 0.9, carbs: 10, fat: 0.2, category: 'Vegetables' },
+  { id: 37, name: 'Bell Pepper (red)', calories: 31, protein: 1, carbs: 7, fat: 0.3, category: 'Vegetables' },
+  { id: 38, name: 'Strawberries', calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3, category: 'Fruits' },
+  { id: 39, name: 'Corn (cooked)', calories: 96, protein: 3.4, carbs: 21, fat: 1.5, category: 'Vegetables' },
+  { id: 40, name: 'Whole Milk Yogurt', calories: 61, protein: 3.5, carbs: 4.7, fat: 3.3, category: 'Dairy' },
 ];
 
-module.exports = foods;
+export default foods;

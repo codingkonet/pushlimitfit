@@ -178,7 +178,8 @@ const ar = {
   // Landing
   landingHero: 'تخطَّ حدودك.\nابنِ مستقبلك.',
   landingSubtitle: 'تتبع تمارينك، احسب سعراتك، اتبع خطط الخبراء — كل شيء في منصة واحدة.',
-  startFree: 'ابدأ مجاناً',
+  startFree: 'ابدأ الآن',
+  openApp: 'افتح التطبيق',
   featuresTitle: 'كل ما تحتاجه لتحقيق التحول',
   howItWorksTitle: 'ابدأ في ٣ خطوات بسيطة',
   step1Title: 'أنشئ حسابك',

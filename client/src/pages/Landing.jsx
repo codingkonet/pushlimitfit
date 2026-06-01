@@ -57,11 +57,8 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-3">
             <LangToggle />
-            <Link to="/login" className="text-sm text-gray-400 hover:text-white transition-colors hidden sm:block">
-              {t('signIn')}
-            </Link>
-            <Link to="/register" className="btn-primary text-sm py-2 px-4">
-              {t('startFree')}
+            <Link to="/dashboard" className="btn-primary text-sm py-2 px-4">
+              {t('openApp')}
             </Link>
           </div>
         </div>
@@ -93,13 +90,9 @@ export default function Landing() {
           </p>
 
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link to="/register"
+            <Link to="/dashboard"
               className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all active:scale-95 shadow-lg shadow-green-500/25">
               {t('startFree')} <ChevronRight size={20} />
-            </Link>
-            <Link to="/login"
-              className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold px-8 py-4 rounded-2xl text-lg transition-all">
-              {t('signIn')}
             </Link>
           </div>
         </div>
@@ -243,7 +236,7 @@ export default function Landing() {
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{t('ctaTitle')}</h2>
           <p className="text-gray-400 mb-8">{t('ctaDesc')}</p>
-          <Link to="/register"
+          <Link to="/dashboard"
             className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all active:scale-95 shadow-lg shadow-green-500/25">
             {t('startFree')} <ChevronRight size={20} />
           </Link>
@@ -261,8 +254,7 @@ export default function Landing() {
             <span className="text-gray-600 text-sm">— {t('footerTagline')}</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <Link to="/login" className="hover:text-gray-300 transition-colors">{t('signIn')}</Link>
-            <Link to="/register" className="hover:text-gray-300 transition-colors">{t('startFree')}</Link>
+            <Link to="/dashboard" className="hover:text-gray-300 transition-colors">{t('openApp')}</Link>
           </div>
         </div>
       </footer>

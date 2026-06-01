@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api/axios';
+import workoutPlans from '../data/workoutPlans';
+import { getSavedPlanIds, toggleSavedPlan } from '../api/storage';
 import { useLang } from '../context/LangContext';
 import { BookOpen, ChevronDown, ChevronUp, Bookmark, Check, Calendar } from 'lucide-react';
 
@@ -12,21 +13,18 @@ const goalKey = { 'Fat Loss': 'fatLoss', 'Muscle Building': 'muscleBuilding', 'G
 export default function WorkoutPlans() {
   const { t } = useLang();
   const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [activeDay, setActiveDay] = useState({});
 
   useEffect(() => {
-    api.get('/plans').then(r => setPlans(r.data)).finally(() => setLoading(false));
+    const saved = getSavedPlanIds();
+    setPlans(workoutPlans.map(p => ({ ...p, saved: saved.includes(p.id) })));
   }, []);
 
-  async function toggleSave(plan) {
-    if (plan.saved) await api.delete(`/plans/${plan.id}/save`);
-    else await api.post(`/plans/${plan.id}/save`);
-    setPlans(prev => prev.map(p => p.id === plan.id ? { ...p, saved: !p.saved } : p));
+  function toggleSave(plan) {
+    const isSaved = toggleSavedPlan(plan.id);
+    setPlans(prev => prev.map(p => p.id === plan.id ? { ...p, saved: isSaved } : p));
   }
-
-  if (loading) return <div className="text-center py-12 text-gray-500">{t('loading')}</div>;
 
   return (
     <div className="space-y-6">

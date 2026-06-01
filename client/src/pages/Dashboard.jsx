@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LangContext';
-import api from '../api/axios';
+import { getProfile, getWorkoutStats, getNutritionByDate, getNutritionHistory } from '../api/storage';
 import { Dumbbell, Apple, Flame, TrendingUp, ChevronRight, Trophy } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -24,22 +23,23 @@ function MacroBar({ label, value, max, color }) {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
   const { t } = useLang();
+  const [profile, setProfile] = useState(getProfile());
   const [stats, setStats] = useState(null);
   const [todayNutrition, setTodayNutrition] = useState(null);
   const [nutritionHistory, setNutritionHistory] = useState([]);
 
   useEffect(() => {
-    api.get('/workouts/meta/stats').then(r => setStats(r.data)).catch(() => {});
-    api.get(`/nutrition?date=${today}`).then(r => setTodayNutrition(r.data)).catch(() => {});
-    api.get('/nutrition/history').then(r => setNutritionHistory(r.data)).catch(() => {});
+    setProfile(getProfile());
+    setStats(getWorkoutStats());
+    setTodayNutrition(getNutritionByDate(today));
+    setNutritionHistory(getNutritionHistory());
   }, []);
 
   const h = new Date().getHours();
   const greeting = h < 12 ? t('goodMorning') : h < 17 ? t('goodAfternoon') : t('goodEvening');
 
-  const calGoal = user?.daily_calories || 2000;
+  const calGoal = profile?.daily_calories || 2000;
   const calConsumed = todayNutrition?.totals?.calories || 0;
   const calRemaining = Math.max(calGoal - calConsumed, 0);
   const calPct = Math.min((calConsumed / calGoal) * 100, 100);
@@ -48,7 +48,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">
-          {greeting}, {user?.username}!
+          {greeting}, {profile?.username || 'You'}!
         </h1>
         <p className="text-gray-400 mt-0.5">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
       </div>
@@ -102,9 +102,9 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="space-y-3">
-            <MacroBar label={t('protein')} value={todayNutrition?.totals?.protein_g || 0} max={user?.protein_g || 150} color="bg-blue-500" />
-            <MacroBar label={t('carbs')} value={todayNutrition?.totals?.carbs_g || 0} max={user?.carbs_g || 200} color="bg-yellow-500" />
-            <MacroBar label={t('fat')} value={todayNutrition?.totals?.fat_g || 0} max={user?.fat_g || 60} color="bg-red-500" />
+            <MacroBar label={t('protein')} value={todayNutrition?.totals?.protein_g || 0} max={profile?.protein_g || 150} color="bg-blue-500" />
+            <MacroBar label={t('carbs')} value={todayNutrition?.totals?.carbs_g || 0} max={profile?.carbs_g || 200} color="bg-yellow-500" />
+            <MacroBar label={t('fat')} value={todayNutrition?.totals?.fat_g || 0} max={profile?.fat_g || 60} color="bg-red-500" />
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {!user?.daily_calories && (
+      {!profile?.daily_calories && (
         <div className="card border-green-500/30 bg-green-500/5">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center shrink-0">

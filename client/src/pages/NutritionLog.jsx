@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api/axios';
-import { useAuth } from '../context/AuthContext';
+import foodsData from '../data/foods';
+import { getProfile, getNutritionByDate, addNutritionLog, deleteNutritionLog } from '../api/storage';
 import { useLang } from '../context/LangContext';
 import { Apple, Plus, Trash2, Search, X, Flame } from 'lucide-react';
 
@@ -9,18 +9,13 @@ const today = new Date().toISOString().slice(0, 10);
 function FoodSearch({ onAdd, onClose }) {
   const { t } = useLang();
   const [q, setQ] = useState('');
-  const [foods, setFoods] = useState([]);
   const [selected, setSelected] = useState(null);
   const [amount, setAmount] = useState(100);
   const [meal, setMeal] = useState('snack');
 
   const MEAL_TYPES_KEYS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-  useEffect(() => {
-    api.get('/nutrition/foods').then(r => setFoods(r.data)).catch(() => {});
-  }, []);
-
-  const filtered = q.length >= 1 ? foods.filter(f => f.name.toLowerCase().includes(q.toLowerCase())) : foods.slice(0, 20);
+  const filtered = q.length >= 1 ? foodsData.filter(f => f.name.toLowerCase().includes(q.toLowerCase())) : foodsData.slice(0, 20);
   function scaled(val) { return Math.round((val * amount) / 100 * 10) / 10; }
 
   function handleAdd() {
@@ -139,30 +134,28 @@ function MealSection({ mealKey, entries, onDelete }) {
 const MEAL_KEYS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 export default function NutritionLog() {
-  const { user } = useAuth();
+  const profile = getProfile();
   const { t } = useLang();
   const [date, setDate] = useState(today);
   const [data, setData] = useState({ logs: [], totals: { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 } });
   const [showSearch, setShowSearch] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadLogs(); }, [date]);
 
-  async function loadLogs() {
-    setLoading(true);
-    try { const { data: d } = await api.get(`/nutrition?date=${date}`); setData(d); } finally { setLoading(false); }
+  function loadLogs() {
+    setData(getNutritionByDate(date));
   }
 
-  async function handleAdd(entry) {
-    await api.post('/nutrition', { date, ...entry });
+  function handleAdd(entry) {
+    addNutritionLog({ date, ...entry });
     setShowSearch(false); loadLogs();
   }
 
-  async function handleDelete(id) {
-    await api.delete(`/nutrition/${id}`); loadLogs();
+  function handleDelete(id) {
+    deleteNutritionLog(id); loadLogs();
   }
 
-  const calGoal = user?.daily_calories || 2000;
+  const calGoal = profile?.daily_calories || 2000;
   const calPct = Math.min((data.totals.calories / calGoal) * 100, 100);
   const byMeal = MEAL_KEYS.reduce((acc, meal) => { acc[meal] = data.logs.filter(e => e.meal_type === meal); return acc; }, {});
 
@@ -195,9 +188,9 @@ export default function NutritionLog() {
         </div>
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: t('protein'), val: data.totals.protein_g, goal: user?.protein_g || 150, color: 'bg-blue-500', text: 'text-blue-400' },
-            { label: t('carbs'), val: data.totals.carbs_g, goal: user?.carbs_g || 200, color: 'bg-yellow-500', text: 'text-yellow-400' },
-            { label: t('fat'), val: data.totals.fat_g, goal: user?.fat_g || 60, color: 'bg-red-500', text: 'text-red-400' },
+            { label: t('protein'), val: data.totals.protein_g, goal: profile?.protein_g || 150, color: 'bg-blue-500', text: 'text-blue-400' },
+            { label: t('carbs'), val: data.totals.carbs_g, goal: profile?.carbs_g || 200, color: 'bg-yellow-500', text: 'text-yellow-400' },
+            { label: t('fat'), val: data.totals.fat_g, goal: profile?.fat_g || 60, color: 'bg-red-500', text: 'text-red-400' },
           ].map(m => (
             <div key={m.label}>
               <div className="flex justify-between text-xs mb-1">
@@ -212,15 +205,11 @@ export default function NutritionLog() {
         </div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-8 text-gray-500">{t('loading')}</div>
-      ) : (
-        <div className="space-y-4">
-          {MEAL_KEYS.map(meal => (
-            <MealSection key={meal} mealKey={meal} entries={byMeal[meal] || []} onDelete={handleDelete} />
-          ))}
-        </div>
-      )}
+      <div className="space-y-4">
+        {MEAL_KEYS.map(meal => (
+          <MealSection key={meal} mealKey={meal} entries={byMeal[meal] || []} onDelete={handleDelete} />
+        ))}
+      </div>
 
       {showSearch && <FoodSearch onAdd={handleAdd} onClose={() => setShowSearch(false)} />}
     </div>

@@ -9,11 +9,9 @@ dist/
 .env.local
 screenshots/
 screenshots2/
-screenshot.mjs
-screenshot2.mjs
+# local diagnostic / verification scripts (not part of the app)
+screenshot*.mjs
 debug.mjs
-diagform.mjs
-diagreg.mjs
-diagdash.mjs
-verify.mjs
+diag*.mjs
+verify*.mjs
 *.log

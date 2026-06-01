@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api/axios';
-import { useAuth } from '../context/AuthContext';
+import { getProfile, saveProfile, calcNutritionTargets, getMeasurements, addMeasurement } from '../api/storage';
 import { useLang } from '../context/LangContext';
 import { User, Save, Scale, Ruler, Target, TrendingUp, Plus } from 'lucide-react';
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
   const { t } = useLang();
+  const [user, setUser] = useState(getProfile());
   const [form, setForm] = useState({ age: '', gender: 'male', height_cm: '', weight_kg: '', activity_level: 'moderate', goal: 'maintain' });
-  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [measurements, setMeasurements] = useState([]);
   const [newMeasurement, setNewMeasurement] = useState({ date: new Date().toISOString().slice(0, 10), weight_kg: '', body_fat_pct: '' });
@@ -20,36 +18,33 @@ export default function Profile() {
   const goalLabels = { lose: t('loseWeight'), maintain: t('maintainWeight'), gain: t('gainMuscle') };
 
   useEffect(() => {
-    if (user) {
-      setForm({ age: user.age || '', gender: user.gender || 'male', height_cm: user.height_cm || '',
-        weight_kg: user.weight_kg || '', activity_level: user.activity_level || 'moderate', goal: user.goal || 'maintain' });
-    }
-    api.get('/user/measurements').then(r => setMeasurements(r.data)).catch(() => {});
-  }, [user]);
+    const p = getProfile();
+    setForm({ age: p.age || '', gender: p.gender || 'male', height_cm: p.height_cm || '',
+      weight_kg: p.weight_kg || '', activity_level: p.activity_level || 'moderate', goal: p.goal || 'maintain' });
+    setMeasurements(getMeasurements());
+  }, []);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  async function handleSave(e) {
+  function handleSave(e) {
     e.preventDefault();
-    setSaving(true);
-    try {
-      const { data } = await api.put('/user/profile', {
-        ...form, age: Number(form.age), height_cm: Number(form.height_cm), weight_kg: Number(form.weight_kg)
-      });
-      updateUser(data);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch (err) {
-      alert(err.response?.data?.error || 'Save failed');
-    } finally { setSaving(false); }
+    const hasAllStats = form.age && form.height_cm && form.weight_kg;
+    const targets = hasAllStats ? calcNutritionTargets(form) : {};
+    const updated = saveProfile({
+      ...form,
+      age: Number(form.age), height_cm: Number(form.height_cm), weight_kg: Number(form.weight_kg),
+      ...targets,
+    });
+    setUser(updated);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   }
 
-  async function logMeasurement(e) {
+  function logMeasurement(e) {
     e.preventDefault();
-    await api.post('/user/measurements', newMeasurement);
+    const updated = addMeasurement(newMeasurement);
     setNewMeasurement({ date: new Date().toISOString().slice(0, 10), weight_kg: '', body_fat_pct: '' });
-    const { data } = await api.get('/user/measurements');
-    setMeasurements(data);
+    setMeasurements(updated);
   }
 
   return (
@@ -126,8 +121,8 @@ export default function Profile() {
               ))}
             </div>
           </div>
-          <button type="submit" className="btn-primary flex items-center gap-2" disabled={saving}>
-            <Save size={16} /> {saving ? t('savingProfile') : saved ? t('savedProfile') : t('saveProfile')}
+          <button type="submit" className="btn-primary flex items-center gap-2">
+            <Save size={16} /> {saved ? t('savedProfile') : t('saveProfile')}
           </button>
         </form>
       </div>

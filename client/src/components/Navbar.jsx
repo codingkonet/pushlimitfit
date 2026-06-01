@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { NavLink } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
 import {
   LayoutDashboard, Dumbbell, BookOpen, Apple,
-  Calculator, User, LogOut, Activity, Menu, X, Globe
+  Calculator, User, Activity, Menu, X, Globe
 } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
   const { t, lang, setLang } = useLang();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const navItems = [
@@ -22,21 +19,15 @@ export default function Navbar() {
     { to: '/profile', icon: User, label: t('profile') },
   ];
 
-  function handleLogout() {
-    logout();
-    navigate('/login');
-    setOpen(false);
-  }
-
   return (
     <nav className="md:hidden bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
       <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-2">
+        <NavLink to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
             <Activity size={16} className="text-white" />
           </div>
           <span className="text-lg font-bold text-white">PushLIMITfit</span>
-        </div>
+        </NavLink>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
@@ -72,13 +63,6 @@ export default function Navbar() {
           >
             <Globe size={18} />
             {lang === 'en' ? 'عربي' : 'English'}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
-          >
-            <LogOut size={18} />
-            {t('signOut')}
           </button>
         </div>
       )}

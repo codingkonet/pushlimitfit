@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api/axios';
+import { calcNutritionTargets, saveProfile } from '../api/storage';
 import { useLang } from '../context/LangContext';
 import { Calculator, Flame, Beef, Wheat, Droplets, Info } from 'lucide-react';
 
@@ -20,7 +20,6 @@ export default function CalorieCalculator() {
   const { t } = useLang();
   const [form, setForm] = useState({ age: '', gender: 'male', height_cm: '', weight_kg: '', activity_level: 'moderate', goal: 'maintain' });
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -39,31 +38,22 @@ export default function CalorieCalculator() {
     { value: 'gain', label: t('gainMuscle'), desc: t('gainMuscleDesc'), color: 'text-orange-400' },
   ];
 
-  async function handleCalculate(e) {
+  function handleCalculate(e) {
     e.preventDefault();
     setError('');
-    setLoading(true);
-    try {
-      const { data } = await api.post('/user/calculate', {
-        ...form, age: Number(form.age), height_cm: Number(form.height_cm), weight_kg: Number(form.weight_kg)
-      });
-      setResult(data);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Error');
-    } finally {
-      setLoading(false);
-    }
+    setResult(calcNutritionTargets(form));
   }
 
-  async function handleSaveToProfile() {
-    try {
-      await api.put('/user/profile', {
-        ...form, age: Number(form.age), height_cm: Number(form.height_cm), weight_kg: Number(form.weight_kg)
-      });
-      alert(t('savedProfile'));
-    } catch {
-      alert('Failed to save');
-    }
+  function handleSaveToProfile() {
+    const targets = calcNutritionTargets(form);
+    saveProfile({
+      ...form,
+      age: Number(form.age),
+      height_cm: Number(form.height_cm),
+      weight_kg: Number(form.weight_kg),
+      ...targets,
+    });
+    alert(t('savedProfile'));
   }
 
   return (
@@ -133,8 +123,8 @@ export default function CalorieCalculator() {
           </div>
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
-          <button type="submit" className="btn-primary w-full" disabled={loading}>
-            {loading ? t('calculating') : t('calculate')}
+          <button type="submit" className="btn-primary w-full">
+            {t('calculate')}
           </button>
         </form>
       </div>

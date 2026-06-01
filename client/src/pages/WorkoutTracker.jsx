@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api/axios';
+import { getWorkouts, getWorkout, addWorkout, updateWorkout, deleteWorkout } from '../api/storage';
+import exercisesData from '../data/exercises';
 import { useLang } from '../context/LangContext';
 import { Plus, Trash2, Dumbbell, Clock, ChevronDown, ChevronUp, Search, X, Save } from 'lucide-react';
 
@@ -31,15 +32,10 @@ function ExerciseRow({ ex, onChange, onRemove }) {
 
 function ExercisePicker({ onAdd, onClose }) {
   const { t } = useLang();
-  const [exercises, setExercises] = useState([]);
   const [q, setQ] = useState('');
   const [category, setCategory] = useState('All');
 
-  useEffect(() => {
-    api.get('/workouts/meta/exercises').then(r => setExercises(r.data)).catch(() => {});
-  }, []);
-
-  const filtered = exercises.filter(e => {
+  const filtered = exercisesData.filter(e => {
     const matchQ = !q || e.name.toLowerCase().includes(q.toLowerCase());
     const matchCat = category === 'All' || e.category === category;
     return matchQ && matchCat;
@@ -157,33 +153,31 @@ function WorkoutForm({ initial, onSave, onCancel }) {
 export default function WorkoutTracker() {
   const { t } = useLang();
   const [workouts, setWorkouts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => { loadWorkouts(); }, []);
 
-  async function loadWorkouts() {
-    try { const { data } = await api.get('/workouts'); setWorkouts(data); } finally { setLoading(false); }
+  function loadWorkouts() {
+    setWorkouts(getWorkouts());
   }
 
-  async function handleSave(data) {
-    if (editing) await api.put(`/workouts/${editing.id}`, data);
-    else await api.post('/workouts', data);
+  function handleSave(data) {
+    if (editing) updateWorkout(editing.id, data);
+    else addWorkout(data);
     setShowForm(false); setEditing(null); loadWorkouts();
   }
 
-  async function handleDelete(id) {
+  function handleDelete(id) {
     if (!confirm('Delete this workout?')) return;
-    await api.delete(`/workouts/${id}`);
+    deleteWorkout(id);
     setWorkouts(p => p.filter(w => w.id !== id));
   }
 
-  async function loadExpanded(id) {
+  function loadExpanded(id) {
     if (expanded?.id === id) return setExpanded(null);
-    const { data } = await api.get(`/workouts/${id}`);
-    setExpanded(data);
+    setExpanded(getWorkout(id));
   }
 
   return (
@@ -204,9 +198,7 @@ export default function WorkoutTracker() {
 
       {showForm && <WorkoutForm initial={editing} onSave={handleSave} onCancel={() => { setShowForm(false); setEditing(null); }} />}
 
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">{t('loading')}</div>
-      ) : workouts.length === 0 ? (
+      {workouts.length === 0 ? (
         <div className="card text-center py-12">
           <Dumbbell size={40} className="mx-auto mb-3 text-gray-700" />
           <p className="text-gray-400 font-medium">{t('noWorkoutsLogged')}</p>
@@ -232,7 +224,7 @@ export default function WorkoutTracker() {
                   <button onClick={() => loadExpanded(w.id)} className="text-gray-400 hover:text-white p-1 transition-colors">
                     {expanded?.id === w.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </button>
-                  <button onClick={() => { api.get(`/workouts/${w.id}`).then(r => { setEditing(r.data); setShowForm(true); }); }}
+                  <button onClick={() => { setEditing(getWorkout(w.id)); setShowForm(true); }}
                     className="text-gray-400 hover:text-green-400 p-1 text-xs transition-colors">{t('edit')}</button>
                   <button onClick={() => handleDelete(w.id)} className="text-gray-400 hover:text-red-400 p-1 transition-colors">
                     <Trash2 size={16} />
