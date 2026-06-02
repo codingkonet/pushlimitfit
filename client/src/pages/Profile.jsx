@@ -1,10 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { getProfile, saveProfile, calcNutritionTargets, getMeasurements, addMeasurement } from '../api/storage';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { getProfile, saveProfile, calcNutritionTargets, getMeasurements, addMeasurement, exportAllData, importAllData } from '../api/storage';
 import { useLang } from '../context/LangContext';
-import { User, Save, Scale, Ruler, Target, TrendingUp, Plus } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
+import ProGate, { ProBadge } from '../components/ProGate';
+import { User, Save, Scale, Ruler, Target, TrendingUp, Plus, Palette, Download, Upload, Sun, Moon, Crown } from 'lucide-react';
+
+const ACCENTS = [
+  { id: 'green', color: '#22c55e' },
+  { id: 'blue', color: '#3b82f6' },
+  { id: 'purple', color: '#a855f7' },
+  { id: 'orange', color: '#f97316' },
+  { id: 'rose', color: '#f43f5e' },
+];
+
+function AppearanceSection() {
+  const { t } = useLang();
+  const { theme, setTheme, accent, setAccent } = useSettings();
+  return (
+    <div className="space-y-5">
+      <div>
+        <label className="label">{t('themeMode')}</label>
+        <div className="grid grid-cols-2 gap-3 max-w-xs">
+          {[{ id: 'dark', icon: Moon, label: t('darkMode') }, { id: 'light', icon: Sun, label: t('lightMode') }].map(m => (
+            <button key={m.id} onClick={() => setTheme(m.id)}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-sm font-medium transition-all ${theme === m.id ? 'border-green-500/50 bg-green-500/5 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-600'}`}>
+              <m.icon size={16} /> {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="label">{t('accentColor')}</label>
+        <div className="flex gap-3">
+          {ACCENTS.map(a => (
+            <button key={a.id} onClick={() => setAccent(a.id)} aria-label={a.id}
+              className={`w-9 h-9 rounded-full transition-all ${accent === a.id ? 'ring-2 ring-offset-2 ring-offset-gray-900 ring-white scale-110' : 'hover:scale-105'}`}
+              style={{ backgroundColor: a.color }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DataSection() {
+  const { t } = useLang();
+  const fileRef = useRef(null);
+
+  function handleExport() {
+    const blob = new Blob([JSON.stringify(exportAllData(), null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pushlimitfit-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImport(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        importAllData(JSON.parse(reader.result));
+        alert(t('importDone'));
+        window.location.reload();
+      } catch {
+        alert(t('importBad'));
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      <button onClick={handleExport} className="btn-secondary flex items-center gap-2">
+        <Download size={16} /> {t('exportData')}
+      </button>
+      <button onClick={() => fileRef.current?.click()} className="btn-secondary flex items-center gap-2">
+        <Upload size={16} /> {t('importData')}
+      </button>
+      <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={handleImport} />
+    </div>
+  );
+}
 
 export default function Profile() {
   const { t } = useLang();
+  const { premium } = useSettings();
   const [user, setUser] = useState(getProfile());
   const [form, setForm] = useState({ age: '', gender: 'male', height_cm: '', weight_kg: '', activity_level: 'moderate', goal: 'maintain' });
   const [saved, setSaved] = useState(false);
@@ -174,6 +259,35 @@ export default function Profile() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Upgrade banner (free tier only) */}
+      {!premium && (
+        <Link to="/upgrade" className="card flex items-center gap-4 border-green-500/30 bg-green-500/5 hover:bg-green-500/10 transition-colors">
+          <div className="w-11 h-11 rounded-xl bg-green-500/15 flex items-center justify-center shrink-0">
+            <Crown size={22} className="text-green-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-white">{t('goPro')}</h3>
+            <p className="text-sm text-gray-400">{t('unlockSubtitle')}</p>
+          </div>
+        </Link>
+      )}
+
+      {/* Appearance (Pro) */}
+      <div className="card">
+        <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
+          <Palette size={18} className="text-green-400" /> {t('appearance')} {!premium && <ProBadge />}
+        </h2>
+        <ProGate><AppearanceSection /></ProGate>
+      </div>
+
+      {/* Data & backup (Pro) */}
+      <div className="card">
+        <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
+          <Download size={18} className="text-green-400" /> {t('dataBackup')} {!premium && <ProBadge />}
+        </h2>
+        <ProGate><DataSection /></ProGate>
       </div>
     </div>
   );

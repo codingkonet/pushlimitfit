@@ -2,6 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme tokens ─────────────────────────────────────────────────────
+   Tailwind's white/gray/green utilities are mapped (in tailwind.config)
+   to these CSS variables, so dark/light + accent swap at runtime. */
+:root, [data-theme="dark"] {
+  --c-white: 255 255 255;
+  --c-gray-50: 249 250 251;
+  --c-gray-100: 243 244 246;
+  --c-gray-200: 229 231 235;
+  --c-gray-300: 209 213 219;
+  --c-gray-400: 156 163 175;
+  --c-gray-500: 107 114 128;
+  --c-gray-600: 75 85 99;
+  --c-gray-700: 55 65 81;
+  --c-gray-800: 31 41 55;
+  --c-gray-900: 17 24 39;
+  --c-gray-950: 3 7 18;
+}
+
+[data-theme="light"] {
+  --c-white: 17 24 39;        /* primary text → near-black */
+  --c-gray-50: 17 24 39;
+  --c-gray-100: 31 41 55;
+  --c-gray-200: 31 41 55;
+  --c-gray-300: 55 65 81;
+  --c-gray-400: 71 85 105;    /* secondary text → readable on light */
+  --c-gray-500: 107 114 128;
+  --c-gray-600: 148 163 184;
+  --c-gray-700: 209 213 219;  /* borders / secondary button bg */
+  --c-gray-800: 226 232 240;  /* inputs / borders */
+  --c-gray-900: 255 255 255;  /* cards */
+  --c-gray-950: 248 250 252;  /* page background */
+}
+
+/* ── Accent palettes ──────────────────────────────────────────────── */
+:root, [data-accent="green"] {
+  --c-accent-400: 74 222 128;
+  --c-accent-500: 34 197 94;
+  --c-accent-600: 22 163 74;
+  --c-accent-700: 21 128 61;
+}
+[data-accent="blue"] {
+  --c-accent-400: 96 165 250;
+  --c-accent-500: 59 130 246;
+  --c-accent-600: 37 99 235;
+  --c-accent-700: 29 78 216;
+}
+[data-accent="purple"] {
+  --c-accent-400: 192 132 252;
+  --c-accent-500: 168 85 247;
+  --c-accent-600: 147 51 234;
+  --c-accent-700: 126 34 206;
+}
+[data-accent="orange"] {
+  --c-accent-400: 251 146 60;
+  --c-accent-500: 249 115 22;
+  --c-accent-600: 234 88 12;
+  --c-accent-700: 194 65 12;
+}
+[data-accent="rose"] {
+  --c-accent-400: 251 113 133;
+  --c-accent-500: 244 63 94;
+  --c-accent-600: 225 29 72;
+  --c-accent-700: 190 18 60;
+}
+
 @layer base {
   body {
     @apply bg-gray-950 text-gray-100 antialiased;
@@ -16,7 +81,8 @@
     @apply bg-gray-900 rounded-2xl border border-gray-800 p-6;
   }
   .btn-primary {
-    @apply bg-green-500 hover:bg-green-600 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-150 active:scale-95;
+    @apply bg-green-500 hover:bg-green-600 font-semibold px-5 py-2.5 rounded-xl transition-all duration-150 active:scale-95;
+    color: #fff; /* always white on the accent, regardless of theme */
   }
   .btn-secondary {
     @apply bg-gray-800 hover:bg-gray-700 text-gray-100 font-semibold px-5 py-2.5 rounded-xl transition-all duration-150 active:scale-95;

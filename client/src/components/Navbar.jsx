@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
+import { useSettings } from '../context/SettingsContext';
 import {
   LayoutDashboard, Dumbbell, BookOpen, Apple,
-  Calculator, User, Activity, Menu, X, Globe
+  Calculator, User, Activity, Menu, X, Globe, BarChart2, Crown
 } from 'lucide-react';
 
 export default function Navbar() {
   const { t, lang, setLang } = useLang();
+  const { premium } = useSettings();
   const [open, setOpen] = useState(false);
 
   const navItems = [
@@ -15,6 +17,7 @@ export default function Navbar() {
     { to: '/workouts', icon: Dumbbell, label: t('workouts') },
     { to: '/plans', icon: BookOpen, label: t('plans') },
     { to: '/nutrition', icon: Apple, label: t('nutrition') },
+    { to: '/analytics', icon: BarChart2, label: t('analytics') },
     { to: '/calculator', icon: Calculator, label: t('calculator') },
     { to: '/profile', icon: User, label: t('profile') },
   ];
@@ -57,6 +60,12 @@ export default function Navbar() {
               {label}
             </NavLink>
           ))}
+          {!premium && (
+            <NavLink to="/upgrade" onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white bg-green-500 hover:bg-green-600 transition-all">
+              <Crown size={18} /> {t('goPro')}
+            </NavLink>
+          )}
           <button
             onClick={() => { setLang(lang === 'en' ? 'ar' : 'en'); setOpen(false); }}
             className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-all"

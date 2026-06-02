@@ -6,6 +6,10 @@ const K = {
   nutrition: 'plt_nutrition',
   savedPlans: 'plt_saved_plans',
   measurements: 'plt_measurements',
+  premium: 'plt_premium',
+  theme: 'plt_theme',
+  accent: 'plt_accent',
+  customPlans: 'plt_custom_plans',
 };
 
 function load(key, fallback = null) {
@@ -139,4 +143,124 @@ export function addMeasurement(data) {
   const updated = [m, ...all].slice(0, 30);
   save(K.measurements, updated);
   return updated;
+}
+
+// ── Premium ──────────────────────────────────────────────────────────
+export function isPremium() { return load(K.premium, false) === true; }
+export function setPremium(val) { save(K.premium, !!val); return !!val; }
+
+// ── Theme & accent ───────────────────────────────────────────────────
+export function getTheme() { return load(K.theme, 'dark'); }
+export function setTheme(t) { save(K.theme, t); return t; }
+export function getAccent() { return load(K.accent, 'green'); }
+export function setAccent(a) { save(K.accent, a); return a; }
+
+// ── Custom workout plans (Pro plan builder) ──────────────────────────
+export function getCustomPlans() { return load(K.customPlans, []); }
+
+export function addCustomPlan(plan) {
+  const all = getCustomPlans();
+  const saved = {
+    ...plan,
+    id: `custom-${Date.now()}`,
+    custom: true,
+    created_at: new Date().toISOString(),
+  };
+  save(K.customPlans, [saved, ...all]);
+  return saved;
+}
+
+export function deleteCustomPlan(id) {
+  save(K.customPlans, getCustomPlans().filter(p => p.id !== id));
+}
+
+// ── Data export / import (Pro backup) ────────────────────────────────
+export function exportAllData() {
+  const data = {};
+  Object.entries(K).forEach(([name, key]) => {
+    const raw = localStorage.getItem(key);
+    if (raw !== null) data[name] = JSON.parse(raw);
+  });
+  return { app: 'PushLIMITfit', version: 1, exported_at: new Date().toISOString(), data };
+}
+
+export function importAllData(payload) {
+  if (!payload || !payload.data) throw new Error('Invalid backup file');
+  Object.entries(payload.data).forEach(([name, value]) => {
+    if (K[name]) save(K[name], value);
+  });
+  return true;
+}
+
+// ── Analytics (Pro) ──────────────────────────────────────────────────
+// Personal records: heaviest weight lifted per exercise
+export function getPersonalRecords() {
+  const all = load(K.workouts, []);
+  const prs = {};
+  all.forEach(w => {
+    (w.exercises || []).forEach(ex => {
+      const weight = Number(ex.weight_kg) || 0;
+      if (weight <= 0) return;
+      if (!prs[ex.exercise_name] || weight > prs[ex.exercise_name].weight_kg) {
+        prs[ex.exercise_name] = { exercise_name: ex.exercise_name, weight_kg: weight, reps: ex.reps, date: w.date };
+      }
+    });
+  });
+  return Object.values(prs).sort((a, b) => b.weight_kg - a.weight_kg);
+}
+
+// Total training volume (sets × reps × weight) per day
+export function getVolumeOverTime() {
+  const all = load(K.workouts, []);
+  const byDate = {};
+  all.forEach(w => {
+    const vol = (w.exercises || []).reduce(
+      (s, ex) => s + (Number(ex.sets) || 0) * (Number(ex.reps) || 0) * (Number(ex.weight_kg) || 0), 0
+    );
+    byDate[w.date] = (byDate[w.date] || 0) + vol;
+  });
+  return Object.entries(byDate)
+    .map(([date, volume]) => ({ date, volume: Math.round(volume) }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-14);
+}
+
+// Current streak: consecutive days (ending today/yesterday) with a workout
+export function getWorkoutStreak() {
+  const all = load(K.workouts, []);
+  const days = new Set(all.map(w => w.date));
+  if (days.size === 0) return 0;
+  let streak = 0;
+  const d = new Date();
+  // allow streak to count if today not yet logged but yesterday was
+  if (!days.has(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1);
+  while (days.has(d.toISOString().slice(0, 10))) {
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+// Bodyweight trend from measurements (oldest → newest)
+export function getWeightTrend() {
+  return getMeasurements()
+    .filter(m => m.weight_kg)
+    .map(m => ({ date: m.date, weight: Number(m.weight_kg) }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// Workouts per ISO week (last 8 weeks)
+export function getWeeklyWorkouts() {
+  const all = load(K.workouts, []);
+  const byWeek = {};
+  all.forEach(w => {
+    const d = new Date(w.date);
+    const onejan = new Date(d.getFullYear(), 0, 1);
+    const week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+    const key = `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
+    byWeek[key] = (byWeek[key] || 0) + 1;
+  });
+  return Object.entries(byWeek)
+    .map(([week, count]) => ({ week: week.slice(5), count }))
+    .slice(-8);
 }
