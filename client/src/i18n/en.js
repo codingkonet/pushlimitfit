@@ -270,6 +270,27 @@ const en = {
   importData: 'Import backup',
   importDone: 'Backup restored! Reloading…',
   importBad: 'Could not read that backup file.',
+
+  // Account / Cloud sync
+  account: 'Account',
+  cloudSync: 'Cloud Sync',
+  accountSubtitle: 'Sign in to sync your data across devices',
+  syncOn: 'Your data syncs across all your devices.',
+  syncedAs: 'Synced as',
+  syncing: 'Syncing…',
+  synced: 'Synced',
+  createAccount: 'Create account',
+  haveAccount: 'Already have an account?',
+  needAccount: "Don't have an account?",
+  emailLabel: 'Email',
+  passwordLabel: 'Password',
+  signInBtn: 'Sign in',
+  signUpBtn: 'Create account',
+  signOutBtn: 'Sign out',
+  syncDisabled: 'Cloud sync is not configured for this build.',
+  syncDisabledHint: 'Add your Supabase keys to enable syncing across devices. The app works fully offline without them.',
+  checkEmail: 'Check your email to confirm your account, then sign in.',
+  authFailed: 'Sign in failed. Check your email and password.',
 };
 
 export default en;

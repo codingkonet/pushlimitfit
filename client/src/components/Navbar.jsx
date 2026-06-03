@@ -4,7 +4,7 @@ import { useLang } from '../context/LangContext';
 import { useSettings } from '../context/SettingsContext';
 import {
   LayoutDashboard, Dumbbell, BookOpen, Apple,
-  Calculator, User, Activity, Menu, X, Globe, BarChart2, Crown
+  Calculator, User, Activity, Menu, X, Globe, BarChart2, Crown, Cloud
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -20,6 +20,7 @@ export default function Navbar() {
     { to: '/analytics', icon: BarChart2, label: t('analytics') },
     { to: '/calculator', icon: Calculator, label: t('calculator') },
     { to: '/profile', icon: User, label: t('profile') },
+    { to: '/account', icon: Cloud, label: t('account') },
   ];
 
   return (

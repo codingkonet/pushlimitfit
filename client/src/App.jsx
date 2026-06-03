@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { LangProvider } from './context/LangContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { AuthProvider } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
@@ -13,6 +14,7 @@ import CalorieCalculator from './pages/CalorieCalculator';
 import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
 import Upgrade from './pages/Upgrade';
+import Account from './pages/Account';
 
 function AppLayout() {
   return (
@@ -34,6 +36,7 @@ export default function App() {
   return (
     <LangProvider>
       <SettingsProvider>
+      <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -46,10 +49,12 @@ export default function App() {
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/upgrade" element={<Upgrade />} />
+            <Route path="/account" element={<Account />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </AuthProvider>
       </SettingsProvider>
     </LangProvider>
   );

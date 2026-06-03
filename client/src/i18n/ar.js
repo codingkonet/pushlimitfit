@@ -270,6 +270,27 @@ const ar = {
   importData: 'استيراد نسخة احتياطية',
   importDone: 'تم استعادة النسخة الاحتياطية! جارٍ إعادة التحميل…',
   importBad: 'تعذّر قراءة ملف النسخة الاحتياطية.',
+
+  // Account / Cloud sync
+  account: 'الحساب',
+  cloudSync: 'المزامنة السحابية',
+  accountSubtitle: 'سجّل الدخول لمزامنة بياناتك عبر أجهزتك',
+  syncOn: 'تتم مزامنة بياناتك عبر جميع أجهزتك.',
+  syncedAs: 'متزامن باسم',
+  syncing: 'جارٍ المزامنة…',
+  synced: 'تمت المزامنة',
+  createAccount: 'إنشاء حساب',
+  haveAccount: 'هل لديك حساب بالفعل؟',
+  needAccount: 'ليس لديك حساب؟',
+  emailLabel: 'البريد الإلكتروني',
+  passwordLabel: 'كلمة المرور',
+  signInBtn: 'تسجيل الدخول',
+  signUpBtn: 'إنشاء حساب',
+  signOutBtn: 'تسجيل الخروج',
+  syncDisabled: 'المزامنة السحابية غير مُهيأة في هذه النسخة.',
+  syncDisabledHint: 'أضف مفاتيح Supabase لتفعيل المزامنة عبر الأجهزة. يعمل التطبيق دون اتصال تماماً بدونها.',
+  checkEmail: 'تحقق من بريدك لتأكيد حسابك، ثم سجّل الدخول.',
+  authFailed: 'فشل تسجيل الدخول. تحقق من بريدك وكلمة المرور.',
 };
 
 export default ar;

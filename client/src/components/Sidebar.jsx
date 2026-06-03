@@ -4,7 +4,7 @@ import { useLang } from '../context/LangContext';
 import { useSettings } from '../context/SettingsContext';
 import {
   LayoutDashboard, Dumbbell, BookOpen, Apple,
-  Calculator, User, Activity, Globe, BarChart2, Crown
+  Calculator, User, Activity, Globe, BarChart2, Crown, Cloud
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -19,6 +19,7 @@ export default function Sidebar() {
     { to: '/analytics', icon: BarChart2, label: t('analytics') },
     { to: '/calculator', icon: Calculator, label: t('calculator') },
     { to: '/profile', icon: User, label: t('profile') },
+    { to: '/account', icon: Cloud, label: t('account') },
   ];
 
   return (

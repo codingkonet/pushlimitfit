@@ -15,7 +15,24 @@ const K = {
 function load(key, fallback = null) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 }
-function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+// Optional change listener — AuthContext registers this to push to the cloud
+// when the user is signed in. When nothing is registered, writes stay local.
+let changeHandler = null;
+export function onDataChange(fn) { changeHandler = fn; }
+
+function save(key, val) {
+  localStorage.setItem(key, JSON.stringify(val));
+  if (changeHandler) changeHandler(key);
+}
+
+// Replace all local data with a bundle pulled from the cloud (no re-emit).
+export function replaceAllLocal(bundle) {
+  if (!bundle) return;
+  Object.entries(K).forEach(([name, key]) => {
+    if (bundle[name] !== undefined) localStorage.setItem(key, JSON.stringify(bundle[name]));
+  });
+}
 
 // ── Profile ─────────────────────────────────────────────────────────
 export function getProfile() {
@@ -175,13 +192,18 @@ export function deleteCustomPlan(id) {
 }
 
 // ── Data export / import (Pro backup) ────────────────────────────────
-export function exportAllData() {
+// Inner { name: value } map of everything in localStorage (used for cloud sync).
+export function getDataBundle() {
   const data = {};
   Object.entries(K).forEach(([name, key]) => {
     const raw = localStorage.getItem(key);
     if (raw !== null) data[name] = JSON.parse(raw);
   });
-  return { app: 'PushLIMITfit', version: 1, exported_at: new Date().toISOString(), data };
+  return data;
+}
+
+export function exportAllData() {
+  return { app: 'PushLIMITfit', version: 1, exported_at: new Date().toISOString(), data: getDataBundle() };
 }
 
 export function importAllData(payload) {

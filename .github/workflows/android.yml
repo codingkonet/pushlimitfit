@@ -29,6 +29,11 @@ jobs:
 
       - name: Build web app
         working-directory: client
+        env:
+          # Optional — set these as repo secrets to bake cloud sync into the APK.
+          # If unset, the app builds fine and runs offline (guest mode).
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
 
       - name: Sync Capacitor Android
