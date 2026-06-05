@@ -58,9 +58,12 @@ export default function Sidebar() {
       {/* Upgrade / Pro + language toggle */}
       <div className="border-t border-gray-800 p-4 space-y-2">
         {premium ? (
-          <div className="flex items-center gap-2 px-3 py-2 text-sm text-green-400 font-medium">
+          <Link
+            to="/upgrade"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-400 hover:bg-gray-800 rounded-xl transition-all"
+          >
             <Crown size={16} /> {t('proMember')}
-          </div>
+          </Link>
         ) : (
           <Link
             to="/upgrade"
