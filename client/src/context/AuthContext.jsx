@@ -45,8 +45,12 @@ export function AuthProvider({ children }) {
       const remote = await pullCloudData(u.id);
       if (remote && Object.keys(remote).length > 0) {
         replaceAllLocal(remote);
-        // re-read everything fresh across the app
-        window.location.reload();
+        // Re-read everything fresh across the app — but at most once per
+        // browser session, so a restored session can never reload-loop.
+        if (!sessionStorage.getItem('plt_synced')) {
+          sessionStorage.setItem('plt_synced', '1');
+          window.location.reload();
+        }
       } else {
         // New account (or empty) → seed the cloud with whatever is local now.
         await pushCloudData(u.id, getDataBundle());
@@ -72,12 +76,22 @@ export function AuthProvider({ children }) {
       setReady(true);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       const u = session?.user ?? null;
-      const wasSignedOut = !userRef.current;
       setUser(u);
-      if (u) { if (wasSignedOut) reconcile(u); refreshProfile(); }
-      if (!u) { userRef.current = null; setProfile(null); }
+      if (!u) {
+        userRef.current = null;
+        setProfile(null);
+        sessionStorage.removeItem('plt_synced');
+        return;
+      }
+      const wasSignedOut = !userRef.current;
+      userRef.current = u;
+      // Only a genuine new sign-in pulls remote data (which may reload).
+      // Restoring a session — INITIAL_SESSION, token refresh, tab refocus —
+      // must NOT, or the app reload-loops on every visit.
+      if (event === 'SIGNED_IN' && wasSignedOut) reconcile(u);
+      refreshProfile();
     });
 
     return () => sub.subscription.unsubscribe();
