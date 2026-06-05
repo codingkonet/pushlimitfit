@@ -30,10 +30,13 @@ jobs:
       - name: Build web app
         working-directory: client
         env:
-          # Optional — set these as repo secrets to bake cloud sync into the APK.
-          # If unset, the app builds fine and runs offline (guest mode).
+          # Optional — set these as repo secrets to bake cloud sync, admin, and
+          # PayPal into the APK. If unset, the app builds fine and runs offline
+          # (guest mode); PayPal falls back to the free demo unlock.
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_PAYPAL_CLIENT_ID: ${{ secrets.VITE_PAYPAL_CLIENT_ID }}
+          VITE_PRO_CURRENCY: ${{ secrets.VITE_PRO_CURRENCY }}
         run: npm run build
 
       - name: Sync Capacitor Android
