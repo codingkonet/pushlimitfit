@@ -180,6 +180,7 @@ const en = {
   landingSubtitle: 'Track workouts, calculate calories, follow expert plans — all in one powerful platform.',
   startFree: 'Get Started',
   openApp: 'Open App',
+  downloadAndroid: 'Download for Android',
   featuresTitle: 'Everything you need to transform',
   howItWorksTitle: 'Get started in 3 simple steps',
   step1Title: 'Create your account',

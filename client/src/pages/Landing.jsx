@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
 import {
   Activity, Calculator, Dumbbell, BookOpen, Apple,
-  ChevronRight, Check, Zap, BarChart2, Globe
+  ChevronRight, Check, Zap, BarChart2, Globe, Smartphone
 } from 'lucide-react';
+
+// Stable public download for the latest Android build (published by the
+// "Build Android APK" GitHub Action to the android-latest release).
+const ANDROID_APK_URL =
+  'https://github.com/codingkonet/pushlimitfit/releases/download/android-latest/pushlimitfit.apk';
 
 function LangToggle() {
   const { lang, setLang } = useLang();
@@ -94,6 +99,10 @@ export default function Landing() {
               className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all active:scale-95 shadow-lg shadow-green-500/25">
               {t('startFree')} <ChevronRight size={20} />
             </Link>
+            <a href={ANDROID_APK_URL}
+              className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all active:scale-95 border border-gray-700">
+              <Smartphone size={20} /> {t('downloadAndroid')}
+            </a>
           </div>
         </div>
       </section>
@@ -254,6 +263,9 @@ export default function Landing() {
             <span className="text-gray-600 text-sm">— {t('footerTagline')}</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
+            <a href={ANDROID_APK_URL} className="hover:text-gray-300 transition-colors inline-flex items-center gap-1.5">
+              <Smartphone size={14} /> {t('downloadAndroid')}
+            </a>
             <Link to="/dashboard" className="hover:text-gray-300 transition-colors">{t('openApp')}</Link>
           </div>
         </div>

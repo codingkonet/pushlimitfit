@@ -5,6 +5,10 @@ on:
     branches: [master]
   workflow_dispatch:
 
+# Needed so the build can publish the APK to a GitHub Release.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -57,3 +61,16 @@ jobs:
           name: PushLIMITfit-debug-apk
           path: client/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      # Publish to a fixed "android-latest" release so the web app can link to a
+      # stable, public download URL that always serves the newest build.
+      - name: Stage APK for release
+        run: cp client/android/app/build/outputs/apk/debug/app-debug.apk pushlimitfit.apk
+
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: PushLIMITfit — latest Android build
+          body: Auto-built debug APK from the latest master commit.
+          files: pushlimitfit.apk

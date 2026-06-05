@@ -180,6 +180,7 @@ const ar = {
   landingSubtitle: 'تتبع تمارينك، احسب سعراتك، اتبع خطط الخبراء — كل شيء في منصة واحدة.',
   startFree: 'ابدأ الآن',
   openApp: 'افتح التطبيق',
+  downloadAndroid: 'تحميل لأندرويد',
   featuresTitle: 'كل ما تحتاجه لتحقيق التحول',
   howItWorksTitle: 'ابدأ في ٣ خطوات بسيطة',
   step1Title: 'أنشئ حسابك',
