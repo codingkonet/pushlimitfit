@@ -291,6 +291,37 @@ const ar = {
   syncDisabledHint: 'أضف مفاتيح Supabase لتفعيل المزامنة عبر الأجهزة. يعمل التطبيق دون اتصال تماماً بدونها.',
   checkEmail: 'تحقق من بريدك لتأكيد حسابك، ثم سجّل الدخول.',
   authFailed: 'فشل تسجيل الدخول. تحقق من بريدك وكلمة المرور.',
+
+  // الترقية / الدفع
+  proPrice: '٩.٩٩ $',
+  proPriceSub: 'دفعة واحدة — وصول مدى الحياة إلى Pro',
+  signInToBuy: 'سجّل الدخول إلى حسابك أولاً، ثم اشترِ Pro.',
+  demoUnlock: 'فتح مجاني — نسخة تجريبية',
+  payFailed: 'فشل الدفع. حاول مرة أخرى.',
+
+  // لوحة الإدارة
+  adminTitle: 'الإدارة',
+  adminSubtitle: 'إدارة المستخدمين والمدفوعات والمحتوى',
+  adminUsers: 'المستخدمون',
+  adminPayments: 'المدفوعات',
+  adminContent: 'المحتوى',
+  adminEmail: 'البريد',
+  adminJoined: 'تاريخ الانضمام',
+  adminPro: 'الخطة',
+  adminAction: 'إجراء',
+  adminGrant: 'منح Pro',
+  adminRevoke: 'إلغاء',
+  adminNoUsers: 'لا يوجد مستخدمون بعد.',
+  adminRevenue: 'إجمالي الإيرادات',
+  adminAmount: 'المبلغ',
+  adminProvider: 'المزود',
+  adminStatus: 'الحالة',
+  adminNoPayments: 'لا توجد مدفوعات بعد.',
+  adminAddFood: 'إضافة طعام',
+  adminFoodHint: 'تظهر الأطعمة المخصصة في سجل التغذية لجميع المستخدمين (القيم لكل 100 غرام).',
+  adminFoodName: 'اسم الطعام',
+  adminCategory: 'الفئة',
+  adminNoFoods: 'لا توجد أطعمة مخصصة بعد.',
 };
 
 export default ar;

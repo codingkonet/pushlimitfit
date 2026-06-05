@@ -1,15 +1,24 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase, isSupabaseConfigured, pullCloudData, pushCloudData } from '../api/supabase';
+import { getMyProfile } from '../api/profile';
 import { onDataChange, getDataBundle, replaceAllLocal } from '../api/storage';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [ready, setReady] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const debounceRef = useRef(null);
   const userRef = useRef(null);
+
+  // Load the server profile (Pro + admin flags) for the current user.
+  const refreshProfile = useCallback(async () => {
+    const p = await getMyProfile();
+    setProfile(p);
+    return p;
+  }, []);
 
   // Push the full local bundle to the cloud (debounced).
   const schedulePush = useCallback(() => {
@@ -59,6 +68,7 @@ export function AuthProvider({ children }) {
       const u = data.session?.user ?? null;
       setUser(u);
       userRef.current = u;
+      if (u) refreshProfile();
       setReady(true);
     });
 
@@ -66,12 +76,12 @@ export function AuthProvider({ children }) {
       const u = session?.user ?? null;
       const wasSignedOut = !userRef.current;
       setUser(u);
-      if (u && wasSignedOut) reconcile(u);
-      if (!u) userRef.current = null;
+      if (u) { if (wasSignedOut) reconcile(u); refreshProfile(); }
+      if (!u) { userRef.current = null; setProfile(null); }
     });
 
     return () => sub.subscription.unsubscribe();
-  }, [schedulePush, reconcile]);
+  }, [schedulePush, reconcile, refreshProfile]);
 
   const signUp = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -91,13 +101,16 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     userRef.current = null;
     setUser(null);
+    setProfile(null);
   }, []);
 
   return (
     <AuthContext.Provider value={{
-      user, ready, syncing,
+      user, profile, ready, syncing,
+      isAdmin: profile?.is_admin === true,
+      proFromServer: profile?.is_pro === true,
       configured: isSupabaseConfigured,
-      signUp, signIn, signOut,
+      signUp, signIn, signOut, refreshProfile,
     }}>
       {children}
     </AuthContext.Provider>

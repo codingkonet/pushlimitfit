@@ -291,6 +291,37 @@ const en = {
   syncDisabledHint: 'Add your Supabase keys to enable syncing across devices. The app works fully offline without them.',
   checkEmail: 'Check your email to confirm your account, then sign in.',
   authFailed: 'Sign in failed. Check your email and password.',
+
+  // Upgrade / payment
+  proPrice: '$9.99',
+  proPriceSub: 'One-time payment — lifetime Pro access',
+  signInToBuy: 'Sign in to your account first, then purchase Pro.',
+  demoUnlock: 'Free unlock — demo build',
+  payFailed: 'Payment failed. Please try again.',
+
+  // Admin panel
+  adminTitle: 'Admin',
+  adminSubtitle: 'Manage users, payments, and content',
+  adminUsers: 'Users',
+  adminPayments: 'Payments',
+  adminContent: 'Content',
+  adminEmail: 'Email',
+  adminJoined: 'Joined',
+  adminPro: 'Plan',
+  adminAction: 'Action',
+  adminGrant: 'Grant Pro',
+  adminRevoke: 'Revoke',
+  adminNoUsers: 'No users yet.',
+  adminRevenue: 'Total revenue',
+  adminAmount: 'Amount',
+  adminProvider: 'Provider',
+  adminStatus: 'Status',
+  adminNoPayments: 'No payments yet.',
+  adminAddFood: 'Add food',
+  adminFoodHint: 'Custom foods appear in the nutrition log for all users (values per 100g).',
+  adminFoodName: 'Food name',
+  adminCategory: 'Category',
+  adminNoFoods: 'No custom foods yet.',
 };
 
 export default en;

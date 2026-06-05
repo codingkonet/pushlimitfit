@@ -2,14 +2,16 @@ import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useLang } from '../context/LangContext';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Dumbbell, BookOpen, Apple,
-  Calculator, User, Activity, Globe, BarChart2, Crown, Cloud
+  Calculator, User, Activity, Globe, BarChart2, Crown, Cloud, Shield
 } from 'lucide-react';
 
 export default function Sidebar() {
   const { t, lang, setLang } = useLang();
   const { premium } = useSettings();
+  const { isAdmin } = useAuth();
 
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard') },
@@ -20,6 +22,7 @@ export default function Sidebar() {
     { to: '/calculator', icon: Calculator, label: t('calculator') },
     { to: '/profile', icon: User, label: t('profile') },
     { to: '/account', icon: Cloud, label: t('account') },
+    ...(isAdmin ? [{ to: '/admin', icon: Shield, label: t('adminTitle') }] : []),
   ];
 
   return (

@@ -51,6 +51,48 @@ Enables the same data on phone (APK) and web. One Supabase project serves both.
 
 That's it — open **Account** in the app to sign in and your data syncs everywhere.
 
+## Payments & Admin (optional) — PayPal + Supabase
+
+Real **Pro purchases** (PayPal) and an **admin panel** build on top of cloud
+sync, so set up Supabase first (above). Both are optional: without PayPal keys
+the Upgrade page falls back to a free demo unlock, and the admin panel only
+appears for accounts flagged as admin.
+
+### 1. Database
+The schema in [`supabase/schema.sql`](supabase/schema.sql) now also creates
+`profiles` (Pro + admin flags, auto-created per user), `payments`, and
+`custom_foods`. Re-run it in the SQL Editor — it's idempotent.
+
+### 2. Create the admin account
+1. **Authentication → Users → Add user**: email `workout@plfit.net`,
+   password `254637` (auto-confirm).
+2. In the **SQL Editor**, grant admin:
+   ```sql
+   update public.profiles set is_admin = true where email = 'workout@plfit.net';
+   ```
+3. Sign in with that account — an **Admin** item appears in the sidebar
+   (users + Pro toggle, payments/revenue, custom-food management).
+
+> Security note: admin access is enforced by Postgres Row Level Security
+> (`is_admin` flag), **not** a hard-coded client password — so the credential
+> can't be read out of the JS bundle.
+
+### 3. PayPal checkout
+1. Create a REST app at [developer.paypal.com](https://developer.paypal.com)
+   → copy its **Client ID** and **Secret**.
+2. Deploy the Edge Function (it holds the secret, never the browser):
+   ```bash
+   supabase functions deploy paypal
+   supabase secrets set PAYPAL_CLIENT_ID=... PAYPAL_SECRET=... PAYPAL_ENV=sandbox PRO_PRICE=9.99 PRO_CURRENCY=USD
+   ```
+3. Add the **public** client id to the web/app build env (alongside the
+   Supabase keys): `VITE_PAYPAL_CLIENT_ID` and optionally `VITE_PRO_CURRENCY`.
+4. Redeploy. The Upgrade page now shows PayPal buttons; a completed payment is
+   verified server-side, which flips `is_pro` and records the sale.
+
+Switch `PAYPAL_ENV` to `live` (with live credentials) when you're ready to take
+real money.
+
 ## Tech Stack
 
 | Layer | Stack |

@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LangContext';
-import { Crown, BarChart2, BookOpen, Download, Palette, Check, Sparkles } from 'lucide-react';
+import { isPayPalConfigured } from '../api/paypal';
+import PayPalButton from '../components/PayPalButton';
+import { Crown, BarChart2, BookOpen, Download, Palette, Check, Sparkles, Cloud, AlertCircle } from 'lucide-react';
 
 export default function Upgrade() {
   const { premium, unlockPremium, resetPremium } = useSettings();
+  const { user, configured, refreshProfile } = useAuth();
   const { t } = useLang();
   const navigate = useNavigate();
   const [justUnlocked, setJustUnlocked] = useState(false);
+  const [error, setError] = useState('');
 
   const features = [
     { icon: BarChart2, t: t('feat_analytics_t'), d: t('feat_analytics_d') },
@@ -17,8 +22,16 @@ export default function Upgrade() {
     { icon: Palette, t: t('feat_themes_t'), d: t('feat_themes_d') },
   ];
 
-  function handleUnlock() {
+  // Demo fallback: only when PayPal isn't configured (offline/local build).
+  function handleDemoUnlock() {
     unlockPremium();
+    setJustUnlocked(true);
+    setTimeout(() => navigate('/analytics'), 1200);
+  }
+
+  async function handlePaid() {
+    setError('');
+    await refreshProfile();          // pull is_pro=true granted server-side
     setJustUnlocked(true);
     setTimeout(() => navigate('/analytics'), 1200);
   }
@@ -69,11 +82,37 @@ export default function Upgrade() {
           <p className="text-green-400 font-bold text-lg flex items-center justify-center gap-2 py-2">
             <Check size={22} /> {t('alreadyPro')}
           </p>
+        ) : isPayPalConfigured ? (
+          // ── Real PayPal checkout ──
+          user ? (
+            <>
+              <div className="text-3xl font-black text-white mb-1">{t('proPrice')}</div>
+              <p className="text-sm text-gray-500 mb-5">{t('proPriceSub')}</p>
+              {error && (
+                <p className="text-red-400 text-sm mb-3 flex items-center justify-center gap-1">
+                  <AlertCircle size={14} /> {error}
+                </p>
+              )}
+              <div className="max-w-xs mx-auto">
+                <PayPalButton onPaid={handlePaid} onError={(e) => setError(e.message || t('payFailed'))} />
+              </div>
+            </>
+          ) : (
+            // Signed out → Pro must attach to an account.
+            <>
+              <div className="text-3xl font-black text-white mb-1">{t('proPrice')}</div>
+              <p className="text-sm text-gray-500 mb-5">{t('signInToBuy')}</p>
+              <Link to="/account" className="btn-primary inline-flex items-center gap-2">
+                <Cloud size={16} /> {t('signInBtn')}
+              </Link>
+            </>
+          )
         ) : (
+          // ── No payment provider configured → demo unlock ──
           <>
             <div className="text-3xl font-black text-white mb-1">$0</div>
-            <p className="text-sm text-gray-500 mb-5">Free unlock — demo build</p>
-            <button onClick={handleUnlock} className="btn-primary text-lg px-8 py-3 inline-flex items-center gap-2">
+            <p className="text-sm text-gray-500 mb-5">{t('demoUnlock')}</p>
+            <button onClick={handleDemoUnlock} className="btn-primary text-lg px-8 py-3 inline-flex items-center gap-2">
               <Crown size={18} /> {t('unlockNow')}
             </button>
           </>

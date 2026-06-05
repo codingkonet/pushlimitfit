@@ -15,6 +15,16 @@ import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
 import Upgrade from './pages/Upgrade';
 import Account from './pages/Account';
+import Admin from './pages/Admin';
+import { useAuth } from './context/AuthContext';
+
+// Admin-only route guard. While the profile is still loading we render nothing
+// to avoid flashing a redirect; non-admins are sent to the dashboard.
+function RequireAdmin() {
+  const { ready, isAdmin } = useAuth();
+  if (!ready) return null;
+  return isAdmin ? <Outlet /> : <Navigate to="/dashboard" replace />;
+}
 
 function AppLayout() {
   return (
@@ -35,8 +45,8 @@ function AppLayout() {
 export default function App() {
   return (
     <LangProvider>
-      <SettingsProvider>
       <AuthProvider>
+      <SettingsProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -50,12 +60,15 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/upgrade" element={<Upgrade />} />
             <Route path="/account" element={<Account />} />
+            <Route element={<RequireAdmin />}>
+              <Route path="/admin" element={<Admin />} />
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-      </AuthProvider>
       </SettingsProvider>
+      </AuthProvider>
     </LangProvider>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import foodsData from '../data/foods';
 import { getProfile, getNutritionByDate, addNutritionLog, deleteNutritionLog } from '../api/storage';
+import { getCustomFoods } from '../api/customFoods';
 import { useLang } from '../context/LangContext';
 import { Apple, Plus, Trash2, Search, X, Flame } from 'lucide-react';
 
@@ -12,10 +13,14 @@ function FoodSearch({ onAdd, onClose }) {
   const [selected, setSelected] = useState(null);
   const [amount, setAmount] = useState(100);
   const [meal, setMeal] = useState('snack');
+  // Admin-managed custom foods (from Supabase) merged ahead of the built-ins.
+  const [customFoods, setCustomFoods] = useState([]);
+  useEffect(() => { getCustomFoods().then(setCustomFoods).catch(() => {}); }, []);
 
   const MEAL_TYPES_KEYS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-  const filtered = q.length >= 1 ? foodsData.filter(f => f.name.toLowerCase().includes(q.toLowerCase())) : foodsData.slice(0, 20);
+  const allFoods = [...customFoods, ...foodsData];
+  const filtered = q.length >= 1 ? allFoods.filter(f => f.name.toLowerCase().includes(q.toLowerCase())) : allFoods.slice(0, 20);
   function scaled(val) { return Math.round((val * amount) / 100 * 10) / 10; }
 
   function handleAdd() {
